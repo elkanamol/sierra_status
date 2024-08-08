@@ -36,11 +36,11 @@ setup(
     author_email="elkanamol@gmail.com",
     long_description=long_description,
     license="MIT",
-    url="https://github.com/elkanamol/sierra_lte_5g_flasher",
+    url="https://github.com/elkanamol/sierra_status",
     project_urls={
-        "Documentation": "https://github.com/elkanamol/sierra_lte_5g_flasher/blob/main/README.md",
-        "Source": "https://github.com/elkanamol/sierra_lte_5g_flasher",
-        "Tracker": "https://github.com/elkanamol/sierra_lte_5g_flasher/issues",
+        "Documentation": "https://github.com/elkanamol/sierra_status/blob/main/README.md",
+        "Source": "https://github.com/elkanamol/sierra_status",
+        "Tracker": "https://github.com/elkanamol/sierra_status/issues",
     },
     # https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[

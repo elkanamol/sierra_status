@@ -7,7 +7,7 @@ This setup configuration includes the package metadata, such as the name, versio
 from setuptools import setup, find_packages
 import os
 
-version = "0.0.3"
+version = "0.1.0"
 # User-friendly description from README.md
 current_directory = os.path.dirname(os.path.abspath(__file__))
 try:

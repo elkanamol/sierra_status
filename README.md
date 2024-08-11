@@ -2,7 +2,7 @@
 
 ## Overview
 
-em-mc_status_script is a Python-based CLI tool designed to retrieve and analyze the status of Sierra Wireless EM9xxx,EM7xxx and WP76 modules. This script provides a quick and efficient way to gather essential information from these modules using AT commands.
+em-mc_status_script is a Python-based CLI tool designed to retrieve and analyze the status of Sierra Wireless EM9xxx,EM7xxx and WP76xx modules. This script provides a quick and efficient way to gather essential information from these modules using AT commands.
 
 ## Features
 

@@ -129,6 +129,8 @@ ENV/
 env.bak/
 venv.bak/
 sierra_status_env/
+.vscode
+.vscode/
 
 # Spyder project settings
 .spyderproject

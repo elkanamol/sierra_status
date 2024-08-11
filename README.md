@@ -17,7 +17,13 @@ em-mc_status_script is a Python-based CLI tool designed to retrieve and analyze 
 To install the package, you can use pip:
 
 ```bash
-pip install https://github.com/elkanamol/sierra_status.git
+pip install git+https://github.com/elkanamol/sierra_status.git
+```
+
+For Ubuntu 18.04 and lower you can use with the following command:
+
+```bash
+pip3.8 install git+https://github.com/elkanamol/sierra_status.git
 ```
 
 Alternatively, you can clone the repository and install it locally:

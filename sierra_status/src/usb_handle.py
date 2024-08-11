@@ -1,7 +1,10 @@
 
+import sys
 import time
 import serial
 import logging
+
+
 AT_COMMANDS = [
     "ATI",
     "AT+CMEE=1",
@@ -34,25 +37,37 @@ AT_COMMANDS = [
     "AT+COPS?"
 ]
 
-AT_COMMAND_COPS = "AT!COPS=?"
+AT_COMMAND_COPS = "AT+COPS=?"
 
-def send_at_command(port: str , command: str, time_to_sleep: float = 0.2) -> str:
+def animate_spinner() -> None:
     """
-    Sends an AT command to the specified serial port and returns the response.  
+    Animates a simple spinner character to indicate an ongoing operation.
     """
-    result, raw_result = "", ""
+    chars = '|/-\\'
+    for char in chars:
+        sys.stdout.write(f'\rReading {char}')
+        sys.stdout.flush()
+        time.sleep(0.05)
+
+def send_at_command(port: str, command: str, timeout: float = 60) -> str:
+    result = ""
+    start_time = time.time()
     try:
-        command_to_send = f"{command}\r\n"
-        logging.debug(f"Sending command: {command}")
-        console = serial.Serial(port, 115200, timeout=2)
-        console.write(command_to_send.encode("utf-8"))
-        time.sleep(time_to_sleep)
-        raw_result = console.read_until(b"OK\r\n" or b"ERROR\r\n").decode("utf-8")
-        result ="\n".join(line.strip() for line in raw_result.splitlines() if line.strip())
-        console.close()
+        with serial.Serial(port, 115200, timeout=0.5) as console:
+            logging.debug(f"Sending command: {command}")
+            console.write(f"{command}\r\n".encode("utf-8"))
+            while time.time() - start_time < timeout:
+                chunk = console.read(1024).decode("utf-8")
+                result += chunk
+                if "OK\r\n" in result or "ERROR\r\n" in result:
+                    break
+                animate_spinner()
     except Exception as e:
         logging.error(f"Error sending command: {e}")
-    return result
+    finally:
+        sys.stdout.write('\r' + ' ' * 20 + '\r')  # Clear the spinner line
+        sys.stdout.flush()
+    return "\n".join(line.strip() for line in result.splitlines() if line.strip())
 
 def get_em_status(port: str, search: int) -> str:
     """
@@ -62,7 +77,7 @@ def get_em_status(port: str, search: int) -> str:
     try:
         result = "\n\n".join(send_at_command(port, command).strip() for command in AT_COMMANDS)
         if search:
-            result += get_em_cops(port)
+            result += "\n\n" +  get_em_cops(port)
     except Exception as e:
         logging.error(f"Error getting EM9 status: {e}")
     return result
@@ -74,7 +89,7 @@ def get_em_cops(port: str) -> str:
     result = ""
     try:
         logging.info(f"Sending command: {AT_COMMAND_COPS},wait for finishing")
-        result = send_at_command(port, AT_COMMAND_COPS, 60)
+        result = "".join(send_at_command(port, AT_COMMAND_COPS, 120).strip())
     except Exception as e:
         logging.error(f"Error getting EM9 status: {e}")
     return result
@@ -102,8 +117,3 @@ def start_process(port: str, model: str, log_level: int, search: int) -> None:
         creat_status_file(result, model)
     else:
         logging.error("No result received from the module.")
-
-    
-
-
-        

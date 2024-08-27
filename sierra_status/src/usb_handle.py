@@ -37,6 +37,41 @@ AT_COMMANDS = [
     "AT+COPS?"
 ]
 
+AT_COMMANDS_HL78 =[
+    "ATI",
+    "AT+CMEE=1",
+    "AT+KSRAT?",
+    "AT+KBNDCFG?",
+    "AT+CIMI",
+    "AT+CPIN?",
+    "AT+CCID?",
+    "AT+CGSN",
+    "AT+HWREV",
+    "AT+CGDCONT?",
+    "AT+KCARRIERCFG?",
+    "AT+CEDRXS?",
+    "AT+CPSMS?",
+    "AT+KSIMDET?",
+    "AT+KSIMSEL?",
+    "AT+CREG?",
+    "AT+CEREG?",
+    "AT+KUSBCOMP?",
+    "AT&V",
+    "AT+IPR?",
+    "AT+CSQ",
+    "AT+KSLEEP?",
+    "AT+KNWSCANCFG?",
+    "AT+KTEMPMON?",
+    "AT+KCERTSTORE?",
+    "AT+KTCPCFG?",
+    "AT+KUDPCFG?",
+    "AT+KIPOPT?",
+    "AT+WDSC?",
+    "AT+WDSG",
+    "AT+NVBU=2",
+    "AT+COPS?"
+]
+
 AT_COMMAND_COPS = "AT+COPS=?"
 
 def animate_spinner() -> None:
@@ -49,11 +84,11 @@ def animate_spinner() -> None:
         sys.stdout.flush()
         time.sleep(0.05)
 
-def send_at_command(port: str, command: str, timeout: float = 60) -> str:
+def send_at_command(port: str, command: str, timeout: float = 60, baudrate: int = 115200) -> str:
     result = ""
     start_time = time.time()
     try:
-        with serial.Serial(port, 115200, timeout=0.5) as console:
+        with serial.Serial(port, baudrate, timeout=0.5) as console:
             logging.debug(f"Sending command: {command}")
             console.write(f"{command}\r\n".encode("utf-8"))
             while time.time() - start_time < timeout:
@@ -69,27 +104,29 @@ def send_at_command(port: str, command: str, timeout: float = 60) -> str:
         sys.stdout.flush()
     return "\n".join(line.strip() for line in result.splitlines() if line.strip())
 
-def get_em_status(port: str, search: int) -> str:
+def get_module_status(port: str, search: int, model: str, baudrate: int = 115200) -> str:
     """
-    Retrieves the status of an EM9xxx module using AT commands.
+    Retrieves the status of an module using AT commands.
     """
     result = ""
     try:
-        result = "\n\n".join(send_at_command(port, command).strip() for command in AT_COMMANDS)
+        commands = AT_COMMANDS_HL78 if model.lower() == "hl78xx" else AT_COMMANDS
+        result = "\n\n".join(send_at_command(port, command, baudrate=baudrate).strip() for command in commands)
         if search:
             result += "\n\n" +  get_em_cops(port)
     except Exception as e:
-        logging.error(f"Error getting EM9 status: {e}")
+        logging.error(f"Error getting module status: {e}")
     return result
 
-def get_em_cops(port: str) -> str:
+def get_em_cops(port: str, baudrate: int = 115200) -> str:
     """
     Retrieves the status of an EM9xxx module using AT commands.
     """
     result = ""
     try:
+
         logging.info(f"Sending command: {AT_COMMAND_COPS},wait for finishing")
-        result = "".join(send_at_command(port, AT_COMMAND_COPS, 120).strip())
+        result = "".join(send_at_command(port, AT_COMMAND_COPS, 120, baudrate).strip())
     except Exception as e:
         logging.error(f"Error getting EM9 status: {e}")
     return result
@@ -106,13 +143,13 @@ def creat_status_file(result: str, model: str) -> None:
     except Exception as e:
         logging.error(f"Error creating status file: {e}")
 
-def start_process(port: str, model: str, log_level: int, search: int) -> None:
+def start_process(port: str, model: str, log_level: int, search: int, baudrate: int = 115200) -> None:
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
     """
     logging.basicConfig(level=log_level)
-    logging.info(f"Starting process for port {port}")
-    result  = get_em_status(port, search)
+    logging.info(f"Starting process for port {port} with model {model} and baudrate {baudrate}")
+    result  = get_module_status(port, search, model, baudrate)
     if result:
         creat_status_file(result, model)
     else:

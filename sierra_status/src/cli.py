@@ -23,12 +23,12 @@ def main() -> None:
     optional.add_argument("-m", "--model", help="Model of the device to add to filename (e.g., EM9191 or EM7455)", default="")
     optional.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
     optional.add_argument("-s", "--search", help="Search for network using AT!COPS=?", action="store_true")
-
+    optional.add_argument("-b", "--baudrate", help="Baudrate to use for serial communication (default: 115200)", default=115200, type=int)
     args = parser.parse_args()
 
     log_level = logging.DEBUG if args.verbose else logging.INFO
     logging.basicConfig(level=log_level)
-    usb_handle.start_process(args.port, args.model.lower(), log_level, args.search)
+    usb_handle.start_process(args.port, args.model.lower(), log_level, args.search, args.baudrate)
 
 if __name__ == "__main__":
         main()

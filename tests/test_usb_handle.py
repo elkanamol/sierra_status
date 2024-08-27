@@ -2,7 +2,7 @@ import logging
 import unittest
 from unittest.mock import mock_open, patch, MagicMock
 
-from sierra_status.src.usb_handle import AT_COMMAND_COPS, AT_COMMANDS, animate_spinner, creat_status_file, get_em_cops, get_em_status, send_at_command, start_process
+from sierra_status.src.usb_handle import AT_COMMAND_COPS, AT_COMMANDS, AT_COMMANDS_HL78, animate_spinner, creat_status_file, get_em_cops, get_module_status, send_at_command, start_process
 
 class TestATCommands(unittest.TestCase):
 
@@ -30,6 +30,17 @@ class TestATCommands(unittest.TestCase):
         for command in AT_COMMANDS:
             self.assertEqual(command, command.upper())
 
+    def test_at_commands_hl78_list_not_empty(self):
+        self.assertTrue(len(AT_COMMANDS_HL78) > 0)
+
+    def test_at_commands_hl78_are_strings(self):
+        for command in AT_COMMANDS_HL78:
+            self.assertIsInstance(command, str)
+
+    def test_at_commands_hl78_start_with_at(self):
+        for command in AT_COMMANDS_HL78:
+            self.assertTrue(command.startswith("AT"))
+
 class TestUSBHandle(unittest.TestCase):
 
     def setUp(self):
@@ -39,7 +50,6 @@ class TestUSBHandle(unittest.TestCase):
 
     @patch('sierra_status.src.usb_handle.serial.Serial')
     def test_send_at_command_success(self, mock_serial):
-        # mock_serial.return_value.read_until.return_value = self.mock_result.encode('utf-8')
         mock_serial.return_value.read.return_value = b'OK\r\n'
         result = send_at_command(self.mock_port, self.mock_command)
         self.assertEqual(result, "")
@@ -51,18 +61,18 @@ class TestUSBHandle(unittest.TestCase):
         self.assertEqual(result, "")
 
     @patch('sierra_status.src.usb_handle.send_at_command')
-    def test_get_em_status_without_search(self, mock_send_at_command):
+    def test_get_module_status_without_search(self, mock_send_at_command):
         mock_send_at_command.return_value = "Test Result"
-        result = get_em_status(self.mock_port, 0)
+        result = get_module_status(self.mock_port, 0, "EM9xxx")
         self.assertIn("Test Result", result)
         self.assertNotIn(AT_COMMAND_COPS, result)
 
     @patch('sierra_status.src.usb_handle.send_at_command')
     @patch('sierra_status.src.usb_handle.get_em_cops')
-    def test_get_em_status_with_search(self, mock_get_em_cops, mock_send_at_command):
+    def test_get_module_status_with_search(self, mock_get_em_cops, mock_send_at_command):
         mock_send_at_command.return_value = "Test Result"
         mock_get_em_cops.return_value = "COPS Result"
-        result = get_em_status(self.mock_port, 1)
+        result = get_module_status(self.mock_port, 1, "EM9xxx")
         self.assertIn("Test Result", result)
         self.assertIn("COPS Result", result)
 
@@ -71,7 +81,7 @@ class TestUSBHandle(unittest.TestCase):
         mock_send_at_command.return_value = "COPS Test Result"
         result = get_em_cops(self.mock_port)
         self.assertEqual(result, "COPS Test Result")
-        mock_send_at_command.assert_called_with(self.mock_port, AT_COMMAND_COPS, 120)
+        mock_send_at_command.assert_called_with(self.mock_port, AT_COMMAND_COPS, 120, 115200)
 
     @patch('builtins.open', new_callable=mock_open)
     @patch('sierra_status.src.usb_handle.time.strftime')
@@ -81,19 +91,20 @@ class TestUSBHandle(unittest.TestCase):
         mock_file.assert_called_with("status_TestModel_20230101_120000.txt", "w")
         mock_file().write.assert_called_with("Test Status")
 
-    @patch('sierra_status.src.usb_handle.get_em_status')
+    @patch('sierra_status.src.usb_handle.get_module_status')
     @patch('sierra_status.src.usb_handle.creat_status_file')
-    def test_start_process_with_result(self, mock_creat_status_file, mock_get_em_status):
-        mock_get_em_status.return_value = "Test Status"
+    def test_start_process_with_result(self, mock_creat_status_file, mock_get_module_status):
+        mock_get_module_status.return_value = "Test Status"
         start_process(self.mock_port, "TestModel", logging.INFO, 0)
         mock_creat_status_file.assert_called_with("Test Status", "TestModel")
 
-    @patch('sierra_status.src.usb_handle.get_em_status')
+    @patch('sierra_status.src.usb_handle.get_module_status')
     @patch('sierra_status.src.usb_handle.creat_status_file')
-    def test_start_process_without_result(self, mock_creat_status_file, mock_get_em_status):
-        mock_get_em_status.return_value = ""
+    def test_start_process_without_result(self, mock_creat_status_file, mock_get_module_status):
+        mock_get_module_status.return_value = ""
         start_process(self.mock_port, "TestModel", logging.INFO, 0)
         mock_creat_status_file.assert_not_called()
+
 
 class TestAnimateSpinner(unittest.TestCase):
 
@@ -121,19 +132,26 @@ class TestSendATCommand(unittest.TestCase):
         result = send_at_command("COM1", "AT+TEST")
         self.assertEqual(result, "")
 
-class TestGetEMStatus(unittest.TestCase):
+class TestGetModuleStatus(unittest.TestCase):
 
     @patch('sierra_status.src.usb_handle.send_at_command')
-    def test_get_em_status_exception(self, mock_send_at_command):
+    def test_get_module_status_exception(self, mock_send_at_command):
         mock_send_at_command.side_effect = Exception("Test exception")
-        result = get_em_status("COM1", 0)
+        result = get_module_status("COM1", 0, "EM9xxx")
         self.assertEqual(result, "")
 
     @patch('sierra_status.src.usb_handle.send_at_command')
-    def test_get_em_status_all_commands(self, mock_send_at_command):
+    def test_get_module_status_all_commands(self, mock_send_at_command):
         mock_send_at_command.return_value = "OK"
-        result = get_em_status("COM1", 0)
+        result = get_module_status("COM1", 0, "EM9xxx")
         self.assertEqual(result.count("OK"), len(AT_COMMANDS))
+
+    @patch('sierra_status.src.usb_handle.send_at_command')
+    def test_get_module_status_hl78xx(self, mock_send_at_command):
+        mock_send_at_command.return_value = "OK"
+        result = get_module_status("COM1", 0, "HL78xx")
+        self.assertEqual(result.count("OK"), len(AT_COMMANDS_HL78))
+
 
 class TestCreatStatusFile(unittest.TestCase):
 
@@ -148,19 +166,19 @@ class TestCreatStatusFile(unittest.TestCase):
 
 class TestStartProcess(unittest.TestCase):
 
-    @patch('sierra_status.src.usb_handle.get_em_status')
+    @patch('sierra_status.src.usb_handle.get_module_status')
     @patch('sierra_status.src.usb_handle.creat_status_file')
     @patch('sierra_status.src.usb_handle.logging.basicConfig')
-    def test_start_process_log_level(self, mock_basicConfig, mock_creat_status_file, mock_get_em_status):
-        mock_get_em_status.return_value = "Test Status"
+    def test_start_process_log_level(self, mock_basicConfig, mock_creat_status_file, mock_get_module_status):
+        mock_get_module_status.return_value = "Test Status"
         start_process("COM1", "TestModel", logging.DEBUG, 0)
         mock_basicConfig.assert_called_with(level=logging.DEBUG)
 
-    @patch('sierra_status.src.usb_handle.get_em_status')
+    @patch('sierra_status.src.usb_handle.get_module_status')
     @patch('sierra_status.src.usb_handle.creat_status_file')
     @patch('sierra_status.src.usb_handle.logging.error')
-    def test_start_process_no_result(self, mock_logging_error, mock_creat_status_file, mock_get_em_status):
-        mock_get_em_status.return_value = ""
+    def test_start_process_no_result(self, mock_logging_error, mock_creat_status_file, mock_get_module_status):
+        mock_get_module_status.return_value = ""
         start_process("COM1", "TestModel", logging.INFO, 0)
         mock_logging_error.assert_called_with("No result received from the module.")
         mock_creat_status_file.assert_not_called()

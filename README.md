@@ -1,6 +1,6 @@
 # sierra_status
 
-[![Generate Python Executable for Windows](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml)
+[![Generate Python Executable for Windows](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml) [![Generate Python Executable for Linux](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml)
 
 ## Overview
 

@@ -20,13 +20,12 @@ jobs:
         python-version: '3.8.x'
 
     - name: Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -40,10 +39,12 @@ jobs:
       id: run-tests
       run: |
         test_output=$(python -m unittest discover tests)
-        echo "::set-output name=test_output::$test_output"
+        echo "test_output<<EOF" >> $GITHUB_OUTPUT
+        echo "$test_output" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Print test results
       if: always()
       run: |
         echo "Test Results:"
-        echo "${{ steps.run-tests.outputs.test_output }}"
+        echo "${{ steps.run-tests.outputs.test_output }}"        echo "${{ steps.run-tests.outputs.test_output }}"

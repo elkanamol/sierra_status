@@ -1,4 +1,4 @@
-# em-mc_status_script
+# sierra_status
 
 ## Overview
 
@@ -34,11 +34,23 @@ cd sierra_status
 pip install
 ```
 
+### Windows Executable
+
+For Windows users, a standalone executable is available. You can download it directly from the latest GitHub release:
+
+1. Go to the [Releases page](https://github.com/elkanamol/sierra_status/releases) of the project.
+2. Find the latest release and download the `sierra-status.exe` file.
+3. Once downloaded, you can run the executable directly without any additional installation.
+
 ## Usage
 
 After installation, you can use the `sierra-status` command-line tool:
 
 sierra-status -p [OPTIONS]
+
+For Windows users using the standalone executable:
+
+sierra-status.exe -p [OPTIONS]
 
 ### Required Arguments
 

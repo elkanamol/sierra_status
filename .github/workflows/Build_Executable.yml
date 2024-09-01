@@ -54,7 +54,7 @@ jobs:
       run: |
         $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*[\"'](.*)[\""']").Matches.Groups[1].Value
         echo $version
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT     
+        echo VERSION=$version >> $env:GITHUB_OUTPUT     
 
     - name: Check working directory
       run: |

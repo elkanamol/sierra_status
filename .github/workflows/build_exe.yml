@@ -47,7 +47,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: dist/sierra-status-linux
-        tag_name: ${{ inputs.tag }}-linux
+        tag_name: ${{ inputs.tag }}
 
     - name: Print directory structure
       run: |

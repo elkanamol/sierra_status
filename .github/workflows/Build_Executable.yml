@@ -24,7 +24,7 @@ jobs:
         python-version: "3.8.10"
 
     - name: Install requirements
-      # working-directory: <your working directory> # can remove this field if your working directory is root
+      working-directory: . # <your working directory> # can remove this field if your working directory is root
       run: pip install -r requirements.txt
 
     - name: Install Pyinstaller

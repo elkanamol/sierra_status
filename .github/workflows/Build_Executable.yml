@@ -49,7 +49,7 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*['\"](.*)['\"]").Matches.Groups[1].Value
+        $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*[\"'](.*)[\""']").Matches.Groups[1].Value
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT     
     - name: Print __version__.py contents
       run: |

@@ -49,14 +49,9 @@ jobs:
     - name: Get version
       id: get_version
       run: |
-        $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*['\"](.*)['\"]").Matches.Groups[1].Value
-        echo "VERSION=$version" >> $env:GITHUB_OUTPUT
-                
-    # - name: Release
-    #   uses: softprops/action-gh-release@v2
-    #   with:
-    #     files: dist/sierra-status.exe
-    #     tag_name: v${{ steps.get_version.outputs.VERSION }}
+        $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*['\"](.*)['\""]").Matches.Groups[1].Value
+        echo "VERSION=$version" >> $env:GITHUB_OUTPUT     
+
     - name: Release
       uses: softprops/action-gh-release@v2
       with:

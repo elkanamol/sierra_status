@@ -1,11 +1,8 @@
-from importlib.metadata import version
+from sierra_status.__version__ import __version__
 import argparse
 import logging
 from sierra_status.src import usb_handle
 import sys, os
-
-
-
 
 def main() -> None:
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +16,7 @@ def main() -> None:
     required.add_argument("-p", "--port", help="USB port to use (e.g., 'COM1' for Windows or '/dev/ttyUSB2' for Linux)", required=True)
     
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument("--version", help="Show version", action="version", version=f"%(prog)s {version('sierra_status')}")
+    optional.add_argument("--version", help="Show version", action="version", version=f"%(prog)s {__version__}")
     optional.add_argument("-m", "--model", help="Model of the device to add to filename (e.g., EM9191 or EM7455)", default="")
     optional.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
     optional.add_argument("-s", "--search", help="Search for network using AT!COPS=?", action="store_true")

@@ -36,7 +36,7 @@ jobs:
     - name: Compile executable
       run: |
         $env:PYTHONPATH = "$env:GITHUB_WORKSPACE;$env:PYTHONPATH"
-        pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse --hidden-import=importlib.metadata --add-data "sierra_status:sierra_status" --clean --windowed .\sierra_status\src\cli.py
+        pyinstaller --onefile --name sierra-status --hidden-import=sierra_status.__version__ --hidden-import=serial --hidden-import=argparse --add-data "sierra_status:sierra_status" .\sierra_status\src\cli.py
     - name: Release
       uses: softprops/action-gh-release@v2
       with:

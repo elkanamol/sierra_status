@@ -46,14 +46,16 @@ jobs:
         $env:PYTHONPATH = "$env:GITHUB_WORKSPACE;$env:PYTHONPATH"
         pyinstaller --onefile --name sierra-status --hidden-import=sierra_status.__version__ --hidden-import=serial --hidden-import=argparse --add-data "sierra_status:sierra_status" .\sierra_status\src\cli.py
 
+    - name: Print __version__.py contents
+      run: |
+        Get-Content .\sierra_status\__version__.py
     - name: Get version
       id: get_version
       run: |
         $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*[\"'](.*)[\""']").Matches.Groups[1].Value
+        echo $version
         echo "VERSION=$version" >> $env:GITHUB_OUTPUT     
-    - name: Print __version__.py contents
-      run: |
-        Get-Content .\sierra_status\__version__.py
+
     - name: Check working directory
       run: |
         Get-Location

@@ -1,0 +1,43 @@
+name: Generate Python Executable for Windows
+
+on:
+  workflow_dispatch: # manually triggered
+    inputs:
+      tag:
+        required: true
+        type: string
+        description: the semver tag your release will have
+
+jobs:
+  create-executable-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write #allows the job to create a release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - uses: ./.github/actions/Build_Executable
+      name: sierra-status # name of the step
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.10
+
+    - name: Install requirements
+      # working-directory: <your working directory> # can remove this field if your working directory is root
+      run: pip install -r requirements.txt
+
+    - name: Install Pyinstaller
+      run: pip install -U pyinstaller
+
+    - name: Compile executable
+      # working-directory: # again, app directory here or skip if root
+      run: pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse .\sierra_status\src\cli.py #or whatever your main file is named
+
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/sierra-status.exe
+        tag_name: ${{ inputs.tag }}

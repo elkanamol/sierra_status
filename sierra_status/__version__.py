@@ -1,2 +1,1 @@
-from ..setup import version
-__version__ = version  # Update this version as needed
+__version__ = "0.1.2"  # Update this version as needed

@@ -1,20 +1,12 @@
 name: Generate Python Executable for Windows
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # manually triggered
     inputs:
       tag:
-        required: false
+        required: true
         type: string
-        description: Override the version tag (leave empty to use version from __version__.py)
-
-# on:
-#   workflow_dispatch: # manually triggered
-#     inputs:
-#       tag:
-#         required: true
-#         type: string
-#         description: the semver tag your release will have
+        description: the semver tag your release will have
 
 jobs:
   create-executable-and-release:
@@ -35,7 +27,6 @@ jobs:
         python-version: "3.8.10"
 
     - name: Install requirements
-      #working-directory: . # <your working directory> # can remove this field if your working directory is root
       run: pip install -r requirements.txt
 
     - name: Install Pyinstaller
@@ -44,17 +35,7 @@ jobs:
     - name: Compile executable
       run: |
         $env:PYTHONPATH = "$env:GITHUB_WORKSPACE;$env:PYTHONPATH"
-        pyinstaller --onefile --name sierra-status --hidden-import=sierra_status.__version__ --hidden-import=serial --hidden-import=argparse --add-data "sierra_status:sierra_status" .\sierra_status\src\cli.py
-
-    - name: Print __version__.py contents
-      run: |
-        Get-Content .\sierra_status\__version__.py
-    - name: Get version
-      id: get_version
-      run: |
-        $version = (Get-Content .\sierra_status\__version__.py | Select-String -Pattern "__version__\s*=\s*[\"'](.*)[\""']").Matches.Groups[1].Value
-        echo $version
-        echo VERSION=$version >> $env:GITHUB_OUTPUT     
+        pyinstaller --onefile --name sierra-status --hidden-import=sierra_status.__version__ --hidden-import=serial --hidden-import=argparse --add-data "sierra_status:sierra_status" .\sierra_status\src\cli.py  
 
     - name: Check working directory
       run: |
@@ -65,7 +46,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: dist/sierra-status.exe
-        tag_name: ${{ inputs.tag || format('v{0}', steps.get_version.outputs.VERSION) }}
+        tag_name: ${{ inputs.tag }}
 
 
     - name: Print directory structure

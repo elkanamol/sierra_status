@@ -24,14 +24,14 @@ jobs:
         python-version: "3.8.10"
 
     - name: Install requirements
-      working-directory: . # <your working directory> # can remove this field if your working directory is root
+      #working-directory: . # <your working directory> # can remove this field if your working directory is root
       run: pip install -r requirements.txt
 
     - name: Install Pyinstaller
       run: pip install -U pyinstaller
 
     - name: Compile executable
-      # working-directory: # again, app directory here or skip if root
+      working-directory: . # again, app directory here or skip if root
       run: pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse --hidden-import=importlib.metadata --clean --windowed .\sierra_status\src\cli.py #or whatever your main file is named
 
     - name: Release

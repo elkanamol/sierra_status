@@ -35,7 +35,7 @@ jobs:
       run: pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse .\sierra_status\src\cli.py #or whatever your main file is named
 
     - name: Release
-      uses: softprops/action-gh-release 
+      uses: softprops/action-gh-release@v2
       with:
         files: dist/sierra-status.exe
         tag_name: ${{ inputs.tag }}

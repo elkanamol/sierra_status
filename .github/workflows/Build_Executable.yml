@@ -32,7 +32,7 @@ jobs:
 
     - name: Compile executable
       # working-directory: # again, app directory here or skip if root
-      run: pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse --hidden-import==importlib.metadata --clean --windowed .\sierra_status\src\cli.py #or whatever your main file is named
+      run: pyinstaller --onefile --name sierra-status --hidden-import=serial --hidden-import=argparse --hidden-import=importlib.metadata --clean --windowed .\sierra_status\src\cli.py #or whatever your main file is named
 
     - name: Release
       uses: softprops/action-gh-release@v2

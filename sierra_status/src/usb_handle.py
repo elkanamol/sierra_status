@@ -136,6 +136,7 @@ def creat_status_file(result: str, model: str) -> None:
     try:
         time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
         result = f"Finished time: {time_stamp}\n" + result
+
         file_name = STATUS_FILE_PATTERN.format(model=model, timestamp=time_stamp)
         with open(file_name, "w") as f:
             f.write(result)
@@ -161,6 +162,7 @@ def start_process(
         None
     """
     start_time = time.time()
+
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
     )
@@ -168,6 +170,7 @@ def start_process(
         f"""Start time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())} 
             Starting process for port {port} 
             with model {model} and baudrate {baudrate}"""
+
     )
     result = get_module_status(port, search, model, baudrate)
     if result:

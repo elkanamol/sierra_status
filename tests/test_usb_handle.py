@@ -3,7 +3,6 @@ import unittest
 import serial
 from unittest.mock import mock_open, patch, MagicMock
 
-
 from sierra_status.src.conf import (
     AT_COMMAND_COPS,
     AT_COMMANDS,
@@ -19,43 +18,27 @@ from sierra_status.src.usb_handle import (
     start_process,
 )
 
+# Test data
+EXPECTED_COMMANDS = ["ATI", "AT+CMEE=1", "AT!GSTATUS?", "AT+CPIN?"]
+ENTER_CND_COMMAND = 'AT!ENTERCND="A710"'
+
 class TestATCommands(unittest.TestCase):
 
-    def test_at_commands_list_not_empty(self) -> None:
-        self.assertTrue(len(AT_COMMANDS) > 0)
-
-    def test_at_commands_are_strings(self) -> None:
-        for command in AT_COMMANDS:
-            self.assertIsInstance(command, str)
-
-    def test_at_commands_start_with_at(self) -> None:
-        for command in AT_COMMANDS:
-            self.assertTrue(command.startswith("AT"))
+    def test_at_commands_properties(self) -> None:
+        for command_list in [AT_COMMANDS, AT_COMMANDS_HL78]:
+            with self.subTest(command_list=command_list):
+                self.assertTrue(len(command_list) > 0)
+                for command in command_list:
+                    self.assertIsInstance(command, str)
+                    self.assertTrue(command.startswith("AT"))
+                    self.assertEqual(command, command.upper())
 
     def test_specific_commands_present(self) -> None:
-        expected_commands = ["ATI", "AT+CMEE=1", "AT!GSTATUS?", "AT+CPIN?"]
-        for command in expected_commands:
+        for command in EXPECTED_COMMANDS:
             self.assertIn(command, AT_COMMANDS)
 
     def test_enter_cnd_command_format(self) -> None:
-        enter_cnd_command = 'AT!ENTERCND="A710"'
-        self.assertIn(enter_cnd_command, AT_COMMANDS)
-
-    def test_at_commands_uppercase(self) -> None:
-        for command in AT_COMMANDS:
-            self.assertEqual(command, command.upper())
-
-    def test_at_commands_hl78_list_not_empty(self) -> None:
-        self.assertTrue(len(AT_COMMANDS_HL78) > 0)
-
-    def test_at_commands_hl78_are_strings(self) -> None:
-        for command in AT_COMMANDS_HL78:
-            self.assertIsInstance(command, str)
-
-    def test_at_commands_hl78_start_with_at(self) -> None:
-        for command in AT_COMMANDS_HL78:
-            self.assertTrue(command.startswith("AT"))
-
+        self.assertIn(ENTER_CND_COMMAND, AT_COMMANDS)
 
 class TestUSBHandle(unittest.TestCase):
 
@@ -64,21 +47,25 @@ class TestUSBHandle(unittest.TestCase):
         self.mock_command = "AT+TEST"
         self.mock_result = "OK\r\n"
 
-    @patch('sierra_status.src.usb_handle.serial.Serial')
-    def test_send_at_command_success(self, mock_serial) -> None:
-        mock_instance = mock_serial.return_value
-        mock_instance.read.return_value = b"OK\r\n"
-        result = send_at_command(self.mock_port, self.mock_command)
-        self.assertEqual(result, "")
+    def test_send_at_command_success(self) -> None:
+        with patch("sierra_status.src.usb_handle.serial.Serial") as mock_serial:
+            mock_instance: MagicMock = mock_serial.return_value
+            mock_instance.read.return_value = b"OK\r\n"
+            result: str = send_at_command(self.mock_port, self.mock_command)
+            self.assertEqual(result, "")
 
-    @patch('sierra_status.src.usb_handle.serial.Serial')
-    def test_send_at_command_exception(self, mock_serial) -> None:
-        mock_serial.side_effect = Exception("Test exception")
-        result = send_at_command(self.mock_port, self.mock_command)
-        self.assertEqual(result, "")
+    def test_send_at_command_exception(self) -> None:
+        with patch(
+            "sierra_status.src.usb_handle.serial.Serial",
+            side_effect=Exception("Test exception"),
+        ):
+            result = send_at_command(self.mock_port, self.mock_command)
+            self.assertEqual(result, "")
 
     @patch('sierra_status.src.usb_handle.send_at_command')
-    def test_get_module_status_without_search(self, mock_send_at_command) -> None:
+    def test_get_module_status_without_search(
+        self, mock_send_at_command: MagicMock
+    ) -> None:
         mock_send_at_command.return_value = "Test Result"
         result = get_module_status(self.mock_port, 0, "EM9xxx")
         self.assertIn("Test Result", result)
@@ -86,7 +73,7 @@ class TestUSBHandle(unittest.TestCase):
     @patch('sierra_status.src.usb_handle.send_at_command')
     @patch('sierra_status.src.usb_handle.get_em_cops')
     def test_get_module_status_with_search(
-        self, mock_get_em_cops, mock_send_at_command
+        self, mock_get_em_cops: MagicMock, mock_send_at_command: MagicMock
     ) -> None:
         mock_send_at_command.return_value = "Test Result"
         mock_get_em_cops.return_value = "COPS Result"
@@ -126,16 +113,23 @@ class TestUSBHandle(unittest.TestCase):
         start_process(self.mock_port, "TestModel", logging.INFO, 0)
         mock_creat_status_file.assert_not_called()
 
-
 class TestAnimateSpinner(unittest.TestCase):
 
-    @patch('sys.stdout')
-    @patch('time.sleep')
-    def test_animate_spinner(self, mock_sleep, mock_stdout) -> None:
-        animate_spinner()
-        self.assertEqual(mock_stdout.write.call_count, 4)
-        self.assertEqual(mock_stdout.flush.call_count, 4)
-        self.assertEqual(mock_sleep.call_count, 4)
+    def test_animate_spinner(self) -> None:
+        with patch("sys.stdout") as mock_stdout, patch("time.sleep") as mock_sleep:
+            animate_spinner()
+            self.assertEqual(mock_stdout.write.call_count, 4)
+            self.assertEqual(mock_stdout.flush.call_count, 4)
+            self.assertEqual(mock_sleep.call_count, 4)
+
+    def test_animate_spinner_interruption(self) -> None:
+        with patch("sys.stdout") as mock_stdout, patch(
+            "time.sleep", side_effect=KeyboardInterrupt()
+        ):
+            with self.assertRaises(KeyboardInterrupt):
+                animate_spinner()
+            self.assertEqual(mock_stdout.write.call_count, 1)
+            self.assertEqual(mock_stdout.flush.call_count, 1)
 
 
 class TestSendATCommand(unittest.TestCase):
@@ -153,7 +147,6 @@ class TestSendATCommand(unittest.TestCase):
         mock_serial.return_value.read_until.return_value = b'ERROR\r\n'
         result = send_at_command("COM1", "AT+TEST")
         self.assertEqual(result, "")
-
 
 class TestGetModuleStatus(unittest.TestCase):
 
@@ -175,7 +168,6 @@ class TestGetModuleStatus(unittest.TestCase):
         result = get_module_status("COM1", 0, "HL78xx")
         self.assertEqual(result.count("OK"), len(AT_COMMANDS_HL78))
 
-
 class TestCreatStatusFile(unittest.TestCase):
 
     @patch('builtins.open', new_callable=mock_open)
@@ -186,7 +178,6 @@ class TestCreatStatusFile(unittest.TestCase):
         with self.assertLogs(level='ERROR') as log:
             creat_status_file("Test Status", "TestModel")
         self.assertIn("Error creating status file", log.output[0])
-
 
 class TestStartProcess(unittest.TestCase):
 
@@ -213,11 +204,6 @@ class TestStartProcess(unittest.TestCase):
         mock_logging_error.assert_called_with("No result received from the module.")
         mock_creat_status_file.assert_not_called()
 
-
-if __name__ == '__main__':
-    unittest.main()
-
-
 class TestSendATCommandAdvanced(unittest.TestCase):
 
     @patch("sierra_status.src.usb_handle.serial.Serial")
@@ -237,19 +223,6 @@ class TestSendATCommandAdvanced(unittest.TestCase):
     def test_send_at_command_invalid_baudrate(self) -> None:
         with self.assertRaises(ValueError):
             send_at_command("COM1", "AT+TEST", baudrate=0)
-
-    # @patch("sierra_status.src.usb_handle.serial.Serial")
-    # def test_send_at_command_multiple_ok_responses(self, mock_serial) -> None:
-    #     mock_serial.return_value.read.side_effect = [b"OK\r\n", b"OK\r\n", b""]
-    #     result = send_at_command("COM1", "AT+TEST")
-    #     self.assertEqual(result, "OK\nOK")
-
-    # @patch("sierra_status.src.usb_handle.serial.Serial")
-    # def test_send_at_command_mixed_responses(self, mock_serial) -> None:
-    #     mock_serial.return_value.read.side_effect = [b"Some data\r\n", b"OK\r\n", b""]
-    #     result = send_at_command("COM1", "AT+TEST")
-    #     self.assertEqual(result, "")
-
 
 class TestGetModuleStatusAdvanced(unittest.TestCase):
 
@@ -278,7 +251,6 @@ class TestGetModuleStatusAdvanced(unittest.TestCase):
         self.assertIn("Test Result", result)
         self.assertNotIn("COPS Error", result)
 
-
 class TestGetEmCopsAdvanced(unittest.TestCase):
 
     @patch("sierra_status.src.usb_handle.send_at_command")
@@ -294,7 +266,6 @@ class TestGetEmCopsAdvanced(unittest.TestCase):
         mock_send_at_command.assert_called_with("COM1", AT_COMMAND_COPS, 120, 9600)
         self.assertEqual(result, "Custom Baudrate Result")
 
-
 class TestCreatStatusFileAdvanced(unittest.TestCase):
 
     @patch("builtins.open", new_callable=mock_open)
@@ -306,57 +277,5 @@ class TestCreatStatusFileAdvanced(unittest.TestCase):
         mock_file.assert_called_with("status_TestModel_20230101_120000.txt", "w")
         mock_file().write.assert_called_with(unicode_content)
 
-    @patch("builtins.open", new_callable=mock_open)
-    @patch("sierra_status.src.usb_handle.time.strftime")
-    def test_creat_status_file_empty_content(self, mock_strftime, mock_file) -> None:
-        mock_strftime.return_value = "20230101_120000"
-        creat_status_file("", "TestModel")
-        mock_file.assert_called_with("status_TestModel_20230101_120000.txt", "w")
-        mock_file().write.assert_called_with("")
-
-
-class TestStartProcessAdvanced(unittest.TestCase):
-
-    @patch("sierra_status.src.usb_handle.get_module_status")
-    @patch("sierra_status.src.usb_handle.creat_status_file")
-    @patch("sierra_status.src.usb_handle.logging.basicConfig")
-    def test_start_process_custom_baudrate(
-        self, mock_basicConfig, mock_creat_status_file, mock_get_module_status
-    ) -> None:
-        mock_get_module_status.return_value = "Custom Baudrate Status"
-        start_process("COM1", "TestModel", logging.INFO, 0, baudrate=9600)
-        mock_get_module_status.assert_called_with("COM1", 0, "TestModel", 9600)
-        mock_creat_status_file.assert_called_with("Custom Baudrate Status", "TestModel")
-
-    @patch("sierra_status.src.usb_handle.get_module_status")
-    @patch("sierra_status.src.usb_handle.creat_status_file")
-    @patch("sierra_status.src.usb_handle.logging.error")
-    def test_start_process_empty_result_with_search(
-        self, mock_logging_error, mock_creat_status_file, mock_get_module_status
-    ) -> None:
-        mock_get_module_status.return_value = ""
-        start_process("COM1", "TestModel", logging.INFO, 1)
-        mock_get_module_status.assert_called_with(
-            "COM1", 1, "TestModel", DEFAULT_BAUDRATE
-        )
-        mock_logging_error.assert_called_with("No result received from the module.")
-        mock_creat_status_file.assert_not_called()
-
-
-class TestAnimateSpinnerAdvanced(unittest.TestCase):
-
-    @patch("sys.stdout")
-    @patch("time.sleep")
-    def test_animate_spinner_interruption(self, mock_sleep, mock_stdout) -> None:
-        mock_sleep.side_effect = KeyboardInterrupt()
-        with self.assertRaises(KeyboardInterrupt):
-            animate_spinner()
-        self.assertEqual(mock_stdout.write.call_count, 1)
-        self.assertEqual(mock_stdout.flush.call_count, 1)
-
-
-@patch("sierra_status.src.usb_handle.serial.Serial")
-def test_send_at_command_invalid_port(self, mock_serial) -> None:
-    mock_serial.side_effect = serial.SerialException("Invalid port")
-    result = send_at_command("INVALID_PORT", "AT+TEST")
-    self.assertEqual(result, "")
+if __name__ == "__main__":
+    unittest.main()

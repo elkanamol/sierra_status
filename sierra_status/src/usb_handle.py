@@ -1,3 +1,4 @@
+from math import log
 import sys
 import time
 import serial
@@ -87,7 +88,7 @@ def get_module_status(
     Returns:
         str: The status information retrieved from the module.
     """
-    result = ""
+    result = f"Starting time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())}\n"
     try:
         commands = AT_COMMANDS_HL78 if model.lower() == "hl78xx" else AT_COMMANDS
         result = "\n\n".join(
@@ -128,6 +129,10 @@ def creat_status_file(result: str, model: str) -> None:
     """
     try:
         time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        result = (
+            f"Finished time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())}\n"
+            + result
+        )
         file_name = STATUS_FILE_PATTERN.format(model=model, timestamp=time_stamp)
         with open(file_name, "w") as f:
             f.write(result)
@@ -142,6 +147,8 @@ def start_process(
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
     """
+    # add a total time counter for run this script
+    start_time = time.time()
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
     )
@@ -153,3 +160,6 @@ def start_process(
         creat_status_file(result, model)
     else:
         logging.error("No result received from the module.")
+    logging.info(
+        f"Total time for running this script: {time.time() - start_time:.2f} seconds"
+    )

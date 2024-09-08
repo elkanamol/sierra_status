@@ -135,10 +135,7 @@ def creat_status_file(result: str, model: str) -> None:
     """
     try:
         time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        result = (
-            f"Finished time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())}\n"
-            + result
-        )
+        result = f"Finished time: {time_stamp}\n" + result
         file_name = STATUS_FILE_PATTERN.format(model=model, timestamp=time_stamp)
         with open(file_name, "w") as f:
             f.write(result)

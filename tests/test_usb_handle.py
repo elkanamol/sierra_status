@@ -96,12 +96,15 @@ class TestUSBHandle(unittest.TestCase):
 
     @patch("sierra_status.src.usb_handle.get_module_status")
     @patch("sierra_status.src.usb_handle.creat_status_file")
+    @patch("sierra_status.src.usb_handle.time.strftime")
     def test_start_process_with_result(
-        self, mock_creat_status_file, mock_get_module_status
+        self, mock_strftime, mock_creat_status_file, mock_get_module_status
     ) -> None:
         mock_get_module_status.return_value = "Test Status"
+        mock_strftime.return_value = "20230101_120000"
         start_process(self.mock_port, "TestModel", logging.INFO, 0)
-        mock_creat_status_file.assert_called_with("Test Status", "TestModel")
+        expected_result = "Finished time: 20230101_120000\nTest Status"
+        mock_creat_status_file.assert_called_with(expected_result, "TestModel")
 
     @patch("sierra_status.src.usb_handle.get_module_status")
     @patch("sierra_status.src.usb_handle.creat_status_file")

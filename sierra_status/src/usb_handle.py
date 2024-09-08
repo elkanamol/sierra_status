@@ -59,7 +59,6 @@ def send_at_command(
                 if "OK\r\n" in result or "ERROR\r\n" in result:
                     break
                 animate_spinner()
-
     except serial.SerialException as e:
         logging.error(f"Serial communication error: {e}")
     except ValueError as e:
@@ -125,6 +124,13 @@ def get_em_cops(port: str, baudrate: int = DEFAULT_BAUDRATE) -> str:
 def creat_status_file(result: str, model: str) -> None:
     """
     Creates a status file with the provided result.
+
+    Args:
+        result (str): The status information to be written to the file.
+        model (str): The model of the module.
+
+    Returns:
+        None
     """
     try:
         time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
@@ -141,15 +147,33 @@ def start_process(
 ) -> None:
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
+
+    Args:
+        port (str): The serial port to use.
+        model (str): The model of the module.
+        log_level (int): The logging level to use.
+        search (int): The search parameter to use.
+        baudrate (int, optional): The baud rate to use for the serial connection. Defaults to the DEFAULT_BAUDRATE.
+
+    Returns:
+        None
     """
+    start_time = time.time()
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
     )
     logging.info(
-        f"Starting process for port {port} with model {model} and baudrate {baudrate}"
+        f"""Start time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())} 
+            Starting process for port {port} 
+            with model {model} and baudrate {baudrate}"""
     )
     result = get_module_status(port, search, model, baudrate)
     if result:
+        time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        result = f"Finished time: {time_stamp}\n" + result
         creat_status_file(result, model)
     else:
         logging.error("No result received from the module.")
+    logging.info(
+        f"Total time for running this script: {time.time() - start_time:.2f} seconds"
+    )

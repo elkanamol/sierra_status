@@ -59,7 +59,6 @@ def send_at_command(
                 if "OK\r\n" in result or "ERROR\r\n" in result:
                     break
                 animate_spinner()
-
     except serial.SerialException as e:
         logging.error(f"Serial communication error: {e}")
     except ValueError as e:
@@ -135,8 +134,6 @@ def creat_status_file(result: str, model: str) -> None:
     """
     try:
         time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        result = f"Finished time: {time_stamp}\n" + result
-
         file_name = STATUS_FILE_PATTERN.format(model=model, timestamp=time_stamp)
         with open(file_name, "w") as f:
             f.write(result)
@@ -162,7 +159,6 @@ def start_process(
         None
     """
     start_time = time.time()
-
     logging.basicConfig(
         level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
     )
@@ -173,6 +169,8 @@ def start_process(
     )
     result = get_module_status(port, search, model, baudrate)
     if result:
+        time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+        result = f"Finished time: {time_stamp}\n" + result
         creat_status_file(result, model)
     else:
         logging.error("No result received from the module.")

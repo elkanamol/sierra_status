@@ -1,4 +1,3 @@
-from math import log
 import sys
 import time
 import serial

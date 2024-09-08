@@ -170,7 +170,6 @@ def start_process(
         f"""Start time: {time.strftime('%Y-%m-%d_%H:%M:%S', time.localtime())} 
             Starting process for port {port} 
             with model {model} and baudrate {baudrate}"""
-
     )
     result = get_module_status(port, search, model, baudrate)
     if result:

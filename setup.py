@@ -3,6 +3,7 @@ Defines the setup configuration for the sierra_flasher package.
 
 This setup configuration includes the package metadata, such as the name, version, description, author, license, and URLs for the project. It also specifies the required Python version, the packages to be included, and the console script entry point.
 """
+
 from sierra_status.__version__ import __version__
 from setuptools import setup, find_packages
 import os
@@ -59,4 +60,3 @@ setup(
     },
     python_requires=">=3.8",  # Requires Python 3.8 and above
 )
-

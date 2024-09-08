@@ -17,9 +17,9 @@ def animate_spinner() -> None:
     """
     Animates a simple spinner character to indicate an ongoing operation.
     """
-    chars = '|/-\\'
+    chars = "|/-\\"
     for char in chars:
-        sys.stdout.write(f'\rReading {char}')
+        sys.stdout.write(f"\rReading {char}")
         sys.stdout.flush()
         time.sleep(0.05)
 
@@ -59,7 +59,7 @@ def send_at_command(
                 if "OK\r\n" in result or "ERROR\r\n" in result:
                     break
                 animate_spinner()
-                
+
     except serial.SerialException as e:
         logging.error(f"Serial communication error: {e}")
     except ValueError as e:
@@ -67,28 +67,33 @@ def send_at_command(
     except Exception as e:
         logging.error(f"Unexpected error: {e}")
     finally:
-        sys.stdout.write('\r' + ' ' * 20 + '\r')  # Clear the spinner line
+        sys.stdout.write("\r" + " " * 20 + "\r")  # Clear the spinner line
         sys.stdout.flush()
     return "\n".join(line.strip() for line in result.splitlines() if line.strip())
 
 
-def get_module_status(port: str, search: int, model: str, baudrate: int = 115200) -> str:
+def get_module_status(
+    port: str, search: int, model: str, baudrate: int = 115200
+) -> str:
     """
     Retrieves the status of an module using AT commands.
-    
+
     Args:
         port (str): The serial port to use.
         search (int): A flag indicating whether to retrieve additional status information using the AT+COPS command.
         model (str): The model of the module.
         baudrate (int, optional): The baud rate to use for the serial connection. Defaults to 115200.
-    
+
     Returns:
         str: The status information retrieved from the module.
     """
     result = ""
     try:
         commands = AT_COMMANDS_HL78 if model.lower() == "hl78xx" else AT_COMMANDS
-        result = "\n\n".join(send_at_command(port, command, baudrate=baudrate).strip() for command in commands)
+        result = "\n\n".join(
+            send_at_command(port, command, baudrate=baudrate).strip()
+            for command in commands
+        )
         if search:
             result += f"\n\n{get_em_cops(port)}"
     except Exception as e:
@@ -99,11 +104,11 @@ def get_module_status(port: str, search: int, model: str, baudrate: int = 115200
 def get_em_cops(port: str, baudrate: int = DEFAULT_BAUDRATE) -> str:
     """
     Retrieves the status of an EM9xxx module using the AT+COPS command.
-    
+
     Args:
         port (str): The serial port to use.
         baudrate (int, optional): The baud rate to use for the serial connection. Defaults to the DEFAULT_BAUDRATE.
-    
+
     Returns:
         str: The status information retrieved from the module.
     """
@@ -137,9 +142,13 @@ def start_process(
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
     """
-    logging.basicConfig(level=log_level, format='%(asctime)s - %(levelname)s - %(message)s')
-    logging.info(f"Starting process for port {port} with model {model} and baudrate {baudrate}")
-    result  = get_module_status(port, search, model, baudrate)
+    logging.basicConfig(
+        level=log_level, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+    logging.info(
+        f"Starting process for port {port} with model {model} and baudrate {baudrate}"
+    )
+    result = get_module_status(port, search, model, baudrate)
     if result:
         creat_status_file(result, model)
     else:

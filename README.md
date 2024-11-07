@@ -12,6 +12,7 @@ em-mc_status_script is a Python-based CLI tool designed to retrieve and analyze 
 - Supports both EM9xxx and EM7xxx series modules
 - Generates a timestamped status file with the collected information
 - Optional network search functionality
+- Interactive mode for sending custom AT commands
 - Configurable verbosity for debugging
 
 ## Installation
@@ -63,6 +64,7 @@ sierra-status.exe -p [OPTIONS]
 - `-m, --model`: Specify the model of the device to add to the filename (e.g., EM9191 or EM7455)
 - `-v, --verbose`: Enable verbose output for debugging
 - `-s, --search`: Perform a network search using the AT!COPS=? command
+- `-i, --interactive`: Enter interactive mode to send custom AT commands
 - `--version`: Show the version of the tool
 
 ## Key Components

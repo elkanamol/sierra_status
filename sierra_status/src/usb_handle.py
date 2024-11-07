@@ -182,12 +182,12 @@ def handle_interactive_session(port: str, baudrate: int, model: str) -> None:
 
 
 def start_process(
-    port: str, 
-    model: str, 
-    log_level: int, 
-    search: int, 
+    port: str,
+    model: str,
+    log_level: int,
+    search: int,
     baudrate: int = DEFAULT_BAUDRATE,
-    interactive: bool = False
+    interactive: bool = False,
 ) -> None:
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
@@ -197,7 +197,7 @@ def start_process(
         model (str): The model of the module.
         log_level (int): The logging level to use.
         search (int): The search parameter to use.
-        baudrate (int, optional): The baud rate to use for the serial connection. 
+        baudrate (int, optional): The baud rate to use for the serial connection.
         interactive (bool, optional): Run in interactive mode if True.
     returns:
         None

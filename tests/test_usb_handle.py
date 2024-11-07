@@ -287,28 +287,30 @@ class TestInteractiveMode(unittest.TestCase):
         self.mock_baudrate = 115200
         self.mock_model = "TestModel"
 
-    @patch('builtins.input')
+    @patch("builtins.input")
     def test_get_interactive_command_valid(self, mock_input) -> None:
         mock_input.return_value = "AT+TEST"
         result = get_interactive_command()
         self.assertEqual(result, "AT+TEST")
 
-    @patch('builtins.input')
+    @patch("builtins.input")
     def test_get_interactive_command_exit(self, mock_input) -> None:
         mock_input.return_value = "exit"
         result = get_interactive_command()
         self.assertEqual(result, "")
 
-    @patch('builtins.input')
+    @patch("builtins.input")
     def test_get_interactive_command_invalid(self, mock_input) -> None:
         mock_input.side_effect = ["INVALID", "AT+TEST"]
         result = get_interactive_command()
         self.assertEqual(result, "AT+TEST")
 
-    @patch('sierra_status.src.usb_handle.get_interactive_command')
-    @patch('sierra_status.src.usb_handle.send_at_command')
-    @patch('sierra_status.src.usb_handle.creat_status_file')
-    def test_handle_interactive_session(self, mock_create_file, mock_send, mock_get_command) -> None:
+    @patch("sierra_status.src.usb_handle.get_interactive_command")
+    @patch("sierra_status.src.usb_handle.send_at_command")
+    @patch("sierra_status.src.usb_handle.creat_status_file")
+    def test_handle_interactive_session(
+        self, mock_create_file, mock_send, mock_get_command
+    ) -> None:
         mock_get_command.side_effect = ["AT+TEST1", "AT+TEST2", ""]
         mock_send.return_value = "OK"
 
@@ -319,22 +321,38 @@ class TestInteractiveMode(unittest.TestCase):
         self.assertIn("AT+TEST1", mock_create_file.call_args[0][0])
         self.assertIn("AT+TEST2", mock_create_file.call_args[0][0])
 
-    @patch('sierra_status.src.usb_handle.handle_interactive_session')
-    @patch('sierra_status.src.usb_handle.get_module_status')
-    def test_start_process_interactive_mode(self, mock_get_status, mock_interactive) -> None:
-        start_process(self.mock_port, "TestModel", logging.INFO, 0, 
-                     self.mock_baudrate, interactive=True)
+    @patch("sierra_status.src.usb_handle.handle_interactive_session")
+    @patch("sierra_status.src.usb_handle.get_module_status")
+    def test_start_process_interactive_mode(
+        self, mock_get_status, mock_interactive
+    ) -> None:
+        start_process(
+            self.mock_port,
+            "TestModel",
+            logging.INFO,
+            0,
+            self.mock_baudrate,
+            interactive=True,
+        )
 
         mock_interactive.assert_called_once_with(
             self.mock_port, self.mock_baudrate, "TestModel"
         )
         mock_get_status.assert_not_called()
 
-    @patch('sierra_status.src.usb_handle.handle_interactive_session')
-    @patch('sierra_status.src.usb_handle.get_module_status')
-    def test_start_process_standard_mode(self, mock_get_status, mock_interactive) -> None:
-        start_process(self.mock_port, "TestModel", logging.INFO, 0, 
-                     self.mock_baudrate, interactive=False)
+    @patch("sierra_status.src.usb_handle.handle_interactive_session")
+    @patch("sierra_status.src.usb_handle.get_module_status")
+    def test_start_process_standard_mode(
+        self, mock_get_status, mock_interactive
+    ) -> None:
+        start_process(
+            self.mock_port,
+            "TestModel",
+            logging.INFO,
+            0,
+            self.mock_baudrate,
+            interactive=False,
+        )
 
         mock_interactive.assert_not_called()
         mock_get_status.assert_called_once()

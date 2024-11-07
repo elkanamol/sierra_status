@@ -111,6 +111,7 @@ def main() -> None:
             logging.getLogger().level,
             args.search,
             args.baudrate,
+            args.interactive,
         )
     except Exception as e:
         logging.error(f"An error occurred: {str(e)}")

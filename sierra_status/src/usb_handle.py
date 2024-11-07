@@ -142,8 +142,52 @@ def creat_status_file(result: str, model: str) -> None:
         logging.error(f"Error creating status file: {e}")
 
 
+def get_interactive_command() -> str:
+    """
+    Gets and validates an AT command from user input.
+
+    Returns:
+        str: Validated AT command or empty string to exit
+    """
+    command = input("Enter AT command: ").strip()
+    if command.lower() == "exit":
+        return ""
+
+    if not command.upper().startswith("AT"):
+        logging.error("Command must start with 'AT'")
+        return get_interactive_command()
+
+    return command
+
+
+def handle_interactive_session(port: str, baudrate: int, model: str) -> None:
+    """
+    Manages an interactive AT command session
+    """
+    logging.info("Interactive AT Command Mode (type 'exit' to quit)")
+    result = ""
+
+    while True:
+        command = get_interactive_command()
+        if not command:
+            logging.info("Exiting interactive mode")
+            break
+
+        response = send_at_command(port, command, DEFAULT_TIMEOUT, baudrate)
+        result += f"\n=== Command: {command} ===\n{response}\n"
+        logging.info(response)
+
+    if result:
+        creat_status_file(result, f"{model}_interactive")
+
+
 def start_process(
-    port: str, model: str, log_level: int, search: int, baudrate: int = DEFAULT_BAUDRATE
+    port: str, 
+    model: str, 
+    log_level: int, 
+    search: int, 
+    baudrate: int = DEFAULT_BAUDRATE,
+    interactive: bool = False
 ) -> None:
     """
     Main function to retrieve the status of an EM9xxx module using AT commands.
@@ -153,9 +197,9 @@ def start_process(
         model (str): The model of the module.
         log_level (int): The logging level to use.
         search (int): The search parameter to use.
-        baudrate (int, optional): The baud rate to use for the serial connection. Defaults to the DEFAULT_BAUDRATE.
-
-    Returns:
+        baudrate (int, optional): The baud rate to use for the serial connection. 
+        interactive (bool, optional): Run in interactive mode if True.
+    returns:
         None
     """
     start_time = time.time()
@@ -167,13 +211,18 @@ def start_process(
             Starting process for port {port} 
             with model {model} and baudrate {baudrate}"""
     )
-    result = get_module_status(port, search, model, baudrate)
-    if result:
-        time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
-        result = f"Finished time: {time_stamp}\n" + result
-        creat_status_file(result, model)
+
+    if interactive:
+        handle_interactive_session(port, baudrate, model)
     else:
-        logging.error("No result received from the module.")
+        result = get_module_status(port, search, model, baudrate)
+        if result:
+            time_stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
+            result = f"Finished time: {time_stamp}\n" + result
+            creat_status_file(result, model)
+        else:
+            logging.error("No result received from the module.")
+
     logging.info(
         f"Total time for running this script: {time.time() - start_time:.2f} seconds"
     )

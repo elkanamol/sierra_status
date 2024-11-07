@@ -94,9 +94,10 @@ def main() -> None:
         type=int,
     )
     optional.add_argument(
-        "-i", "--interactive",
+        "-i",
+        "--interactive",
         help="Enter interactive mode to send custom AT commands",
-        action="store_true"
+        action="store_true",
     )
 
     args = parser.parse_args()

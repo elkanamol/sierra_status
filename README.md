@@ -1,6 +1,6 @@
 # sierra_status
 
-[![Generate Python Executable for Windows](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml) [![Generate Python Executable for Linux](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml)[![Run Tests](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml)
+[![Windows' exe](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml) [![Linux' bin](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml) [![Run Tests](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml) [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Felkanamol%2Fsierra_status&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
 ## Overview
 

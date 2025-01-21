@@ -1,6 +1,18 @@
 # sierra_status
 
-[![Windows' exe](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml) [![Linux' bin](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml) [![Run Tests](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml) [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Felkanamol%2Fsierra_status&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
+<!--- [![Windows' exe](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/Build_Executable.yml) 
+[![Linux' bin](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/build_exe.yml) 
+[![Run Tests](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml/badge.svg)](https://github.com/elkanamol/sierra_status/actions/workflows/test.yml) 
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Felkanamol%2Fsierra_status&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)--->
+
+[![GitHub Repo stars](https://img.shields.io/github/stars/elkanamol/sierra_status?style=plastic)](https://github.com/elkanamol/sierra_status/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/elkanamol/sierra_status?style=plastic)](https://github.com/elkanamol/sierra_status/forks)
+[![GitHub watchers](https://img.shields.io/github/watchers/elkanamol/sierra_status?style=plastic)](https://github.com/elkanamol/sierra_status/watchers)
+[![GitHub contributors](https://img.shields.io/github/contributors/elkanamol/sierra_status?style=plastic)](https://github.com/elkanamol/sierra_status/graphs/contributors)
+[![GitHub tag (with filter)](https://img.shields.io/github/v/tag/elkanamol/sierra_status?style=plastic&label=latest)](https://github.com/elkanamol/sierra_status/releases/latest)
+[![GitHub release (by tag)](https://img.shields.io/github/downloads/elkanamol/sierra_status/latest/total?style=plastic)](https://github.com/elkanamol/sierra_status/releases/latest)
+[![GitHub all releases](https://img.shields.io/github/downloads/elkanamol/sierra_status/total?style=plastic&label=total%20downloads)](https://github.com/elkanamol/sierra_status/releases)
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Felkanamol%2Fsierra_status&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false_style=plastic)](https://hits.seeyoufarm.com)
 
 ## Overview
 
